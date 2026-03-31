@@ -5,18 +5,18 @@ const DEFAULTS = { temperature: 0.7, top_p: 0.9, max_tokens: null, system_prompt
 
 function Slider({ label, value, min, max, step, onChange, description }) {
   return (
-    <div className="mb-5">
-      <div className="flex justify-between mb-1">
-        <label className="text-sm font-medium text-zinc-300">{label}</label>
-        <span className="text-sm text-amber-400 font-mono">{value}</span>
+    <div className="mb-6">
+      <div className="flex justify-between mb-2">
+        <label className="text-sm font-medium text-[#ccc]">{label}</label>
+        <span className="text-sm text-[#2affd4] font-mono tabular-nums">{value}</span>
       </div>
       <input
         type="range" min={min} max={max} step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full accent-amber-500"
+        className="w-full accent-[#2affd4] cursor-pointer"
       />
-      {description && <p className="text-xs text-zinc-600 mt-1">{description}</p>}
+      {description && <p className="text-xs text-[#888] mt-1.5">{description}</p>}
     </div>
   )
 }
@@ -26,12 +26,12 @@ export default function ModelSettings({ onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-80 h-full bg-zinc-950 border-l border-zinc-800 p-5 overflow-y-auto flex flex-col">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-white">Model Settings</h2>
-          <button onClick={onClose} className="p-1 hover:bg-zinc-800 rounded-lg transition-colors">
-            <X size={18} className="text-zinc-400" />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-80 h-full bg-[#111] border-l border-[#1e1e1e] p-6 overflow-y-auto flex flex-col">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-base font-semibold text-white">Settings</h2>
+          <button onClick={onClose} className="p-1.5 hover:bg-[#1e1e1e] rounded-lg transition-colors text-[#888] hover:text-white">
+            <X size={16} />
           </button>
         </div>
 
@@ -40,7 +40,7 @@ export default function ModelSettings({ onClose }) {
           value={settings.temperature}
           min={0} max={2} step={0.05}
           onChange={(v) => updateSettings({ temperature: v })}
-          description="Higher = more creative, lower = more focused"
+          description="Higher = more creative · Lower = more focused"
         />
 
         <Slider
@@ -51,34 +51,34 @@ export default function ModelSettings({ onClose }) {
           description="Nucleus sampling threshold"
         />
 
-        <div className="mb-5">
-          <label className="block text-sm font-medium text-zinc-300 mb-1">Max Tokens</label>
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-[#ccc] mb-2">Max Tokens</label>
           <input
             type="number"
             placeholder="Unlimited"
             value={settings.max_tokens ?? ''}
             onChange={(e) => updateSettings({ max_tokens: e.target.value ? Number(e.target.value) : null })}
-            className="w-full bg-zinc-900 text-zinc-100 rounded-lg px-3 py-2 text-sm border border-zinc-800 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+            className="w-full bg-[#1a1a1a] text-[#e0e0e0] rounded-xl px-3 py-2.5 text-sm border border-[#2a2a2a] focus:outline-none focus:border-[#2affd4]/30 placeholder-[#444]"
           />
-          <p className="text-xs text-zinc-600 mt-1">Leave empty for no limit</p>
+          <p className="text-xs text-[#888] mt-1.5">Leave empty for no limit</p>
         </div>
 
-        <div className="mb-5 flex-1">
-          <label className="block text-sm font-medium text-zinc-300 mb-1">System Prompt</label>
+        <div className="mb-6 flex-1">
+          <label className="block text-sm font-medium text-[#ccc] mb-2">System Prompt</label>
           <textarea
             value={settings.system_prompt}
             onChange={(e) => updateSettings({ system_prompt: e.target.value })}
             placeholder="You are a helpful assistant…"
             rows={6}
-            className="w-full bg-zinc-900 text-zinc-100 rounded-lg px-3 py-2 text-sm border border-zinc-800 focus:outline-none focus:ring-1 focus:ring-amber-500/50 resize-none placeholder-zinc-600"
+            className="w-full bg-[#1a1a1a] text-[#e0e0e0] rounded-xl px-3 py-2.5 text-sm border border-[#2a2a2a] focus:outline-none focus:border-[#2affd4]/30 resize-none placeholder-[#444]"
           />
         </div>
 
         <button
           onClick={() => updateSettings(DEFAULTS)}
-          className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-200 transition-colors mt-auto"
+          className="flex items-center gap-2 text-xs text-[#888] hover:text-white transition-colors mt-auto"
         >
-          <RotateCcw size={14} />
+          <RotateCcw size={13} />
           Reset to defaults
         </button>
       </div>

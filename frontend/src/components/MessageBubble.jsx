@@ -16,7 +16,7 @@ function CopyButton({ text, size = 13 }) {
   return (
     <button
       onClick={copy}
-      className="flex items-center gap-1 px-2 py-1 rounded-md text-[#555] hover:text-white hover:bg-[#1e1e1e] transition-colors text-xs"
+      className="flex items-center gap-1 px-2 py-1 rounded-md text-[#888] hover:text-white hover:bg-[#1e1e1e] transition-colors text-xs"
       title="Copy"
     >
       {copied
@@ -65,7 +65,7 @@ export default function MessageBubble({ message, onRegenerate }) {
                 ))}
               </div>
             )}
-            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl rounded-br-sm px-4 py-3 text-[15px] text-[#e8e8e8] leading-relaxed whitespace-pre-wrap break-words">
+            <div dir="auto" className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl rounded-br-sm px-4 py-3 text-[15px] text-white leading-relaxed whitespace-pre-wrap break-words">
               {message.content}
             </div>
           </div>
@@ -79,7 +79,7 @@ export default function MessageBubble({ message, onRegenerate }) {
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="prose-chat text-[15px]">
+            <div dir="auto" className="prose-chat text-[15px]">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
@@ -103,13 +103,13 @@ export default function MessageBubble({ message, onRegenerate }) {
               {onRegenerate && (
                 <button
                   onClick={() => onRegenerate(message.id)}
-                  className="flex items-center gap-1 px-2 py-1 rounded-md text-[#555] hover:text-white hover:bg-[#1e1e1e] transition-colors text-xs"
+                  className="flex items-center gap-1 px-2 py-1 rounded-md text-[#888] hover:text-white hover:bg-[#1e1e1e] transition-colors text-xs"
                 >
                   <RefreshCw size={13} /><span>Regenerate</span>
                 </button>
               )}
               {message.token_count && (
-                <span className="text-xs text-[#444] ml-1">{message.token_count} tokens</span>
+                <span className="text-xs text-[#999] ml-1">{message.token_count} tokens</span>
               )}
             </div>
           </div>

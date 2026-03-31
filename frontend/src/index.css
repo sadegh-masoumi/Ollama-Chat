@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 * {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Vazirmatn', 'Inter', sans-serif;
 }
 
 /* Custom scrollbar */
@@ -30,7 +30,7 @@ html, body, #root {
 
 /* Markdown content styles */
 .prose-chat {
-  color: #e2e2e2;
+  color: #f0f0f0;
   line-height: 1.75;
 }
 .prose-chat p {

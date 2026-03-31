@@ -49,7 +49,7 @@ export default function App() {
         <div className="h-12 flex items-center px-4 gap-3 border-b border-[#1e1e1e] flex-shrink-0">
           <button
             onClick={() => setSidebarOpen((o) => !o)}
-            className="p-1.5 rounded-lg hover:bg-[#1e1e1e] text-[#666] hover:text-white transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[#1e1e1e] text-[#999] hover:text-white transition-colors"
             title="Toggle sidebar"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -57,7 +57,7 @@ export default function App() {
             </svg>
           </button>
           {activeConversation?.title && (
-            <span className="text-sm text-[#666] truncate">{activeConversation.title}</span>
+            <span className="text-sm text-[#999] truncate">{activeConversation.title}</span>
           )}
         </div>
 

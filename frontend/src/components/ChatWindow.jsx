@@ -20,7 +20,7 @@ export default function ChatWindow() {
           <Sparkles size={22} className="text-[#2affd4]" />
         </div>
         <h2 className="text-2xl font-semibold text-white mb-2">What can I help with?</h2>
-        <p className="text-sm text-[#555]">Powered by Ollama · running locally</p>
+        <p className="text-sm text-[#888]">Powered by Ollama · running locally</p>
       </div>
     )
   }

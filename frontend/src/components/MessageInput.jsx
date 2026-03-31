@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
-import { Send, Square, Paperclip, X, Image } from 'lucide-react'
+import { Send, Square, Paperclip, X, ArrowUp } from 'lucide-react'
 import clsx from 'clsx'
 import { uploadFile } from '../api/client'
 import useChatStore from '../store/chatStore'
@@ -59,54 +59,59 @@ export default function MessageInput({ onSend, onStop }) {
 
   const handlePaste = (e) => {
     const items = Array.from(e.clipboardData.items)
-    const imageItems = items.filter((i) => i.kind === 'file' && i.type.startsWith('image/'))
-    if (imageItems.length) handleFiles(imageItems.map((i) => i.getAsFile()))
+    const imgs = items.filter((i) => i.kind === 'file' && i.type.startsWith('image/'))
+    if (imgs.length) handleFiles(imgs.map((i) => i.getAsFile()))
   }
+
+  const hasContent = text.trim() || attachments.length > 0
 
   return (
     <div
       className={clsx(
-        'border-t border-zinc-800 bg-zinc-950 p-4 transition-colors',
-        dragOver && 'bg-zinc-900'
+        'rounded-2xl border transition-colors',
+        dragOver
+          ? 'border-[#2affd4]/40 bg-[#161616]'
+          : 'border-[#2a2a2a] bg-[#161616] hover:border-[#333]',
+        'focus-within:border-[#2affd4]/30'
       )}
       onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
       onDragLeave={() => setDragOver(false)}
       onDrop={handleDrop}
     >
-      {/* Attachment previews */}
+      {/* Attachments */}
       {attachments.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-3">
+        <div className="flex flex-wrap gap-2 px-4 pt-3">
           {attachments.map((att, i) => (
             <div key={i} className="relative group">
               {att.type === 'image' ? (
                 <img src={att.preview} alt={att.name}
-                  className="h-16 w-16 object-cover rounded-lg border border-zinc-700" />
+                  className="h-14 w-14 object-cover rounded-lg border border-[#2a2a2a]" />
               ) : (
-                <div className="flex items-center gap-1 bg-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-300 border border-zinc-700">
-                  <Image size={14} />
-                  <span className="max-w-[120px] truncate">{att.name}</span>
+                <div className="flex items-center gap-1.5 bg-[#1e1e1e] border border-[#2a2a2a] rounded-lg px-3 py-1.5 text-xs text-[#888]">
+                  <Paperclip size={11} />
+                  <span className="max-w-[100px] truncate">{att.name}</span>
                 </div>
               )}
               <button
                 onClick={() => setAttachments((prev) => prev.filter((_, j) => j !== i))}
-                className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute -top-1 -right-1 w-4 h-4 bg-[#333] hover:bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
               >
-                <X size={10} className="text-white" />
+                <X size={9} className="text-white" />
               </button>
             </div>
           ))}
         </div>
       )}
 
-      <div className="flex items-end gap-2">
-        {/* File upload button */}
+      {/* Input row */}
+      <div className="flex items-end gap-2 px-3 py-3">
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="p-2 text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors flex-shrink-0"
-          title="Attach file or image"
+          className="p-1.5 text-[#999] hover:text-[#888] rounded-lg transition-colors flex-shrink-0 mb-0.5"
+          title="Attach file"
         >
-          <Paperclip size={20} />
+          <Paperclip size={17} />
         </button>
         <input
           ref={fileInputRef}
@@ -117,48 +122,52 @@ export default function MessageInput({ onSend, onStop }) {
           onChange={(e) => handleFiles(Array.from(e.target.files))}
         />
 
-        {/* Textarea */}
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
-          placeholder={dragOver ? 'Drop files here…' : 'Message (Enter to send, Shift+Enter for newline)'}
+          placeholder={dragOver ? 'Drop files here…' : 'Ask anything… / هر چیزی بپرسید'}
           disabled={isStreaming}
+          dir="auto"
           rows={1}
           className={clsx(
-            'flex-1 bg-zinc-900 text-white rounded-xl px-4 py-3 text-sm resize-none border border-zinc-800',
-            'placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/30',
-            'max-h-40 overflow-y-auto',
+            'flex-1 bg-transparent text-white text-[15px] resize-none',
+            'placeholder-[#666] focus:outline-none',
+            'max-h-48 overflow-y-auto leading-relaxed',
             isStreaming && 'opacity-50 cursor-not-allowed'
           )}
-          style={{ minHeight: '48px' }}
+          style={{ minHeight: '28px' }}
         />
 
-        {/* Send / Stop button */}
         {isStreaming ? (
           <button
             onClick={onStop}
-            className="p-3 bg-red-600 hover:bg-red-500 rounded-xl text-white transition-colors flex-shrink-0"
-            title="Stop generation"
+            className="w-8 h-8 flex items-center justify-center rounded-xl bg-[#2a2a2a] hover:bg-[#333] text-white transition-colors flex-shrink-0 mb-0.5"
+            title="Stop"
           >
-            <Square size={18} />
+            <Square size={14} />
           </button>
         ) : (
           <button
             onClick={handleSend}
-            disabled={!text.trim() && attachments.length === 0}
+            disabled={!hasContent}
             className={clsx(
-              'p-3 rounded-xl transition-colors flex-shrink-0',
-              text.trim() || attachments.length
-                ? 'bg-amber-500 hover:bg-amber-400 text-black'
-                : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+              'w-8 h-8 flex items-center justify-center rounded-xl transition-colors flex-shrink-0 mb-0.5',
+              hasContent
+                ? 'bg-[#2affd4] hover:bg-[#20e8be] text-black'
+                : 'bg-[#1e1e1e] text-[#999] cursor-not-allowed'
             )}
-            title="Send message"
+            title="Send"
           >
-            <Send size={18} />
+            <ArrowUp size={16} />
           </button>
         )}
+      </div>
+
+      {/* Hint */}
+      <div className="px-4 pb-2.5 flex items-center gap-3">
+        <span className="text-[11px] text-[#333]">Enter to send · Shift+Enter for newline</span>
       </div>
     </div>
   )
