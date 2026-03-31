@@ -32,7 +32,9 @@ router = APIRouter(tags=["chat"])
 @router.get("/conversations", response_model=list[ConversationResponse])
 async def list_conversations(db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(Conversation).order_by(Conversation.updated_at.desc())
+        select(Conversation)
+        .options(selectinload(Conversation.messages))
+        .order_by(Conversation.updated_at.desc())
     )
     conversations = result.scalars().all()
     return conversations
@@ -50,8 +52,12 @@ async def create_conversation(
     )
     db.add(conversation)
     await db.commit()
-    await db.refresh(conversation)
-    return conversation
+    result = await db.execute(
+        select(Conversation)
+        .options(selectinload(Conversation.messages))
+        .where(Conversation.id == conversation.id)
+    )
+    return result.scalar_one()
 
 
 @router.get("/conversations/{conversation_id}", response_model=ConversationResponse)
@@ -108,8 +114,12 @@ async def update_conversation(
 
     conversation.updated_at = datetime.now(timezone.utc)
     await db.commit()
-    await db.refresh(conversation)
-    return conversation
+    result = await db.execute(
+        select(Conversation)
+        .options(selectinload(Conversation.messages))
+        .where(Conversation.id == conversation_id)
+    )
+    return result.scalar_one()
 
 
 @router.post("/conversations/{conversation_id}/messages", response_model=MessageResponse)

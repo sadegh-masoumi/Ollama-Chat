@@ -21,7 +21,7 @@ export function useChat() {
   } = useChatStore()
 
   const connectWs = useCallback(() => {
-    if (wsRef.current && wsRef.current.readyState <= WebSocket.OPEN) return
+    if (wsRef.current && wsRef.current.readyState <= WebSocket.OPEN) return wsRef.current
     const ws = new WebSocket(WS_URL)
     wsRef.current = ws
     ws.onclose = () => { wsRef.current = null }

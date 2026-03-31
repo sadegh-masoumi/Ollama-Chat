@@ -9,7 +9,7 @@ const useChatStore = create(
       activeConversation: null,
       isStreaming: false,
       streamingContent: '',
-      currentModel: 'llama3',
+      currentModel: 'qwen2.5:14b',
       settings: {
         temperature: 0.7,
         top_p: 0.9,
@@ -37,11 +37,11 @@ const useChatStore = create(
 
       addMessage: (message) =>
         set((s) => {
-          if (!s.activeConversation) return {}
+          const conv = s.activeConversation || { id: null, title: '', messages: [] }
           return {
             activeConversation: {
-              ...s.activeConversation,
-              messages: [...(s.activeConversation.messages || []), message],
+              ...conv,
+              messages: [...(conv.messages || []), message],
             },
           }
         }),

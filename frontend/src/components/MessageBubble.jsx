@@ -2,11 +2,11 @@ import { useState, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { Copy, Check, RefreshCw, Edit2 } from 'lucide-react'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { Copy, Check, RefreshCw } from 'lucide-react'
 import clsx from 'clsx'
 
-function CopyButton({ text, className }) {
+function CopyButton({ text, size = 13 }) {
   const [copied, setCopied] = useState(false)
   const copy = useCallback(() => {
     navigator.clipboard.writeText(text)
@@ -14,8 +14,15 @@ function CopyButton({ text, className }) {
     setTimeout(() => setCopied(false), 2000)
   }, [text])
   return (
-    <button onClick={copy} className={clsx('p-1 rounded hover:bg-gray-600 transition-colors', className)}>
-      {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} className="text-gray-400" />}
+    <button
+      onClick={copy}
+      className="flex items-center gap-1 px-2 py-1 rounded-md text-[#555] hover:text-white hover:bg-[#1e1e1e] transition-colors text-xs"
+      title="Copy"
+    >
+      {copied
+        ? <><Check size={size} className="text-[#2affd4]" /><span>Copied</span></>
+        : <><Copy size={size} /><span>Copy</span></>
+      }
     </button>
   )
 }
@@ -24,16 +31,16 @@ function CodeBlock({ children, className }) {
   const language = /language-(\w+)/.exec(className || '')?.[1] || 'text'
   const code = String(children).replace(/\n$/, '')
   return (
-    <div className="relative group my-2 rounded-lg overflow-hidden">
-      <div className="flex items-center justify-between bg-gray-900 px-3 py-1.5 text-xs text-gray-400">
-        <span>{language}</span>
+    <div className="my-3 rounded-xl overflow-hidden border border-[#2a2a2a]">
+      <div className="flex items-center justify-between bg-[#161616] px-4 py-2">
+        <span className="text-xs text-[#2affd4]/60 font-mono">{language}</span>
         <CopyButton text={code} />
       </div>
       <SyntaxHighlighter
-        style={oneDark}
+        style={vscDarkPlus}
         language={language}
         PreTag="div"
-        customStyle={{ margin: 0, borderRadius: 0, fontSize: '0.85em' }}
+        customStyle={{ margin: 0, borderRadius: 0, fontSize: '0.82em', background: '#0d0d0d', padding: '1rem' }}
       >
         {code}
       </SyntaxHighlighter>
@@ -41,95 +48,73 @@ function CodeBlock({ children, className }) {
   )
 }
 
-export default function MessageBubble({ message, onRegenerate, onEdit }) {
+export default function MessageBubble({ message, onRegenerate }) {
   const isUser = message.role === 'user'
-  const [editing, setEditing] = useState(false)
-  const [editText, setEditText] = useState(message.content)
-
-  const handleEdit = () => {
-    if (editing && onEdit) {
-      onEdit(message.id, editText)
-    }
-    setEditing(!editing)
-  }
 
   return (
-    <div className={clsx('group flex items-start gap-3 px-4 py-3', isUser && 'flex-row-reverse')}>
-      {/* Avatar */}
-      <div className={clsx(
-        'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0',
-        isUser ? 'bg-blue-600 text-white' : 'bg-indigo-600 text-white'
-      )}>
-        {isUser ? 'U' : 'AI'}
-      </div>
-
-      {/* Bubble */}
-      <div className={clsx(
-        'relative max-w-[80%] rounded-2xl px-4 py-3',
-        isUser
-          ? 'bg-blue-600 text-white rounded-tr-sm'
-          : 'bg-gray-700 text-gray-100 rounded-tl-sm'
-      )}>
-        {/* Images preview */}
-        {message.images?.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-2">
-            {message.images.map((img, i) => (
-              <img key={i} src={`data:image/jpeg;base64,${img}`} alt="attachment"
-                className="max-h-40 rounded-lg object-contain" />
-            ))}
-          </div>
-        )}
-
-        {/* Content */}
-        {editing ? (
-          <textarea
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            className="w-full bg-transparent border border-white/30 rounded p-1 text-sm resize-none focus:outline-none min-w-[200px]"
-            rows={3}
-            autoFocus
-          />
-        ) : isUser ? (
-          <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
-        ) : (
-          <div className="prose-chat text-sm">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                code({ node, inline, className, children, ...props }) {
-                  if (inline) return <code className={className} {...props}>{children}</code>
-                  return <CodeBlock className={className}>{children}</CodeBlock>
-                },
-              }}
-            >
+    <div className="group">
+      {isUser ? (
+        /* ── User message ── */
+        <div className="flex justify-end">
+          <div className="max-w-[75%]">
+            {message.images?.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2 justify-end">
+                {message.images.map((img, i) => (
+                  <img key={i} src={`data:image/jpeg;base64,${img}`} alt="attachment"
+                    className="max-h-48 rounded-xl object-contain border border-[#2a2a2a]" />
+                ))}
+              </div>
+            )}
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl rounded-br-sm px-4 py-3 text-[15px] text-[#e8e8e8] leading-relaxed whitespace-pre-wrap break-words">
               {message.content}
-            </ReactMarkdown>
+            </div>
           </div>
-        )}
+        </div>
+      ) : (
+        /* ── Assistant message ── */
+        <div className="flex gap-3">
+          {/* Icon */}
+          <div className="w-7 h-7 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="text-[10px] font-bold text-[#2affd4]">AI</span>
+          </div>
 
-        {/* Token count */}
-        {message.token_count && (
-          <div className="text-xs text-gray-400 mt-1">{message.token_count} tokens</div>
-        )}
-      </div>
+          <div className="flex-1 min-w-0">
+            <div className="prose-chat text-[15px]">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  code({ node, inline, className, children, ...props }) {
+                    if (inline) return (
+                      <code className="bg-[#1e1e1e] text-[#2affd4] px-1.5 py-0.5 rounded text-[0.82em] font-mono border border-[#2a2a2a]" {...props}>
+                        {children}
+                      </code>
+                    )
+                    return <CodeBlock className={className}>{children}</CodeBlock>
+                  },
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+            </div>
 
-      {/* Action buttons */}
-      <div className={clsx(
-        'flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity self-center',
-        isUser ? 'flex-row-reverse' : ''
-      )}>
-        <CopyButton text={message.content} className="text-gray-500" />
-        {isUser && (
-          <button onClick={handleEdit} className="p-1 rounded hover:bg-gray-700 transition-colors">
-            <Edit2 size={14} className="text-gray-500" />
-          </button>
-        )}
-        {!isUser && onRegenerate && (
-          <button onClick={() => onRegenerate(message.id)} className="p-1 rounded hover:bg-gray-700 transition-colors">
-            <RefreshCw size={14} className="text-gray-500" />
-          </button>
-        )}
-      </div>
+            {/* Actions row */}
+            <div className="flex items-center gap-1 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <CopyButton text={message.content} />
+              {onRegenerate && (
+                <button
+                  onClick={() => onRegenerate(message.id)}
+                  className="flex items-center gap-1 px-2 py-1 rounded-md text-[#555] hover:text-white hover:bg-[#1e1e1e] transition-colors text-xs"
+                >
+                  <RefreshCw size={13} /><span>Regenerate</span>
+                </button>
+              )}
+              {message.token_count && (
+                <span className="text-xs text-[#444] ml-1">{message.token_count} tokens</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

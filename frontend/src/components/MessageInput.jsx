@@ -6,7 +6,7 @@ import useChatStore from '../store/chatStore'
 
 export default function MessageInput({ onSend, onStop }) {
   const [text, setText] = useState('')
-  const [attachments, setAttachments] = useState([]) // [{type, name, data, preview}]
+  const [attachments, setAttachments] = useState([])
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const fileInputRef = useRef(null)
@@ -19,18 +19,12 @@ export default function MessageInput({ onSend, onStop }) {
         const result = await uploadFile(file)
         if (result.type === 'image') {
           setAttachments((prev) => [...prev, {
-            type: 'image',
-            name: file.name,
+            type: 'image', name: file.name,
             data: result.base64,
             preview: `data:${result.mime_type};base64,${result.base64}`,
           }])
         } else {
-          setAttachments((prev) => [...prev, {
-            type: 'text',
-            name: file.name,
-            data: result.content,
-            preview: null,
-          }])
+          setAttachments((prev) => [...prev, { type: 'text', name: file.name, data: result.content, preview: null }])
           setText((t) => t + (t ? '\n\n' : '') + `[File: ${file.name}]\n${result.content}`)
         }
       } catch (e) {
@@ -66,17 +60,14 @@ export default function MessageInput({ onSend, onStop }) {
   const handlePaste = (e) => {
     const items = Array.from(e.clipboardData.items)
     const imageItems = items.filter((i) => i.kind === 'file' && i.type.startsWith('image/'))
-    if (imageItems.length) {
-      const files = imageItems.map((i) => i.getAsFile())
-      handleFiles(files)
-    }
+    if (imageItems.length) handleFiles(imageItems.map((i) => i.getAsFile()))
   }
 
   return (
     <div
       className={clsx(
-        'border-t border-gray-700 bg-gray-800 p-4 transition-colors',
-        dragOver && 'bg-gray-700'
+        'border-t border-zinc-800 bg-zinc-950 p-4 transition-colors',
+        dragOver && 'bg-zinc-900'
       )}
       onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
       onDragLeave={() => setDragOver(false)}
@@ -89,9 +80,9 @@ export default function MessageInput({ onSend, onStop }) {
             <div key={i} className="relative group">
               {att.type === 'image' ? (
                 <img src={att.preview} alt={att.name}
-                  className="h-16 w-16 object-cover rounded-lg border border-gray-600" />
+                  className="h-16 w-16 object-cover rounded-lg border border-zinc-700" />
               ) : (
-                <div className="flex items-center gap-1 bg-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300">
+                <div className="flex items-center gap-1 bg-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-300 border border-zinc-700">
                   <Image size={14} />
                   <span className="max-w-[120px] truncate">{att.name}</span>
                 </div>
@@ -112,7 +103,7 @@ export default function MessageInput({ onSend, onStop }) {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="p-2 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
+          className="p-2 text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors flex-shrink-0"
           title="Attach file or image"
         >
           <Paperclip size={20} />
@@ -136,10 +127,10 @@ export default function MessageInput({ onSend, onStop }) {
           disabled={isStreaming}
           rows={1}
           className={clsx(
-            'flex-1 bg-gray-700 text-gray-100 rounded-xl px-4 py-3 text-sm resize-none',
-            'placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500',
+            'flex-1 bg-zinc-900 text-white rounded-xl px-4 py-3 text-sm resize-none border border-zinc-800',
+            'placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/30',
             'max-h-40 overflow-y-auto',
-            isStreaming && 'opacity-60 cursor-not-allowed'
+            isStreaming && 'opacity-50 cursor-not-allowed'
           )}
           style={{ minHeight: '48px' }}
         />
@@ -148,7 +139,7 @@ export default function MessageInput({ onSend, onStop }) {
         {isStreaming ? (
           <button
             onClick={onStop}
-            className="p-3 bg-red-600 hover:bg-red-700 rounded-xl text-white transition-colors flex-shrink-0"
+            className="p-3 bg-red-600 hover:bg-red-500 rounded-xl text-white transition-colors flex-shrink-0"
             title="Stop generation"
           >
             <Square size={18} />
@@ -158,10 +149,10 @@ export default function MessageInput({ onSend, onStop }) {
             onClick={handleSend}
             disabled={!text.trim() && attachments.length === 0}
             className={clsx(
-              'p-3 rounded-xl text-white transition-colors flex-shrink-0',
+              'p-3 rounded-xl transition-colors flex-shrink-0',
               text.trim() || attachments.length
-                ? 'bg-indigo-600 hover:bg-indigo-700'
-                : 'bg-gray-600 cursor-not-allowed opacity-50'
+                ? 'bg-amber-500 hover:bg-amber-400 text-black'
+                : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
             )}
             title="Send message"
           >
